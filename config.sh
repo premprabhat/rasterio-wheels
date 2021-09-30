@@ -48,11 +48,10 @@ function build_proj {
 
 function build_sqlite {
     if [ -e sqlite-stamp ]; then return; fi
-    fetch_unpack https://www.sqlite.org/2020/sqlite-autoconf-${SQLITE_VERSION}.tar.gz
-    (cd sqlite-autoconf-${SQLITE_VERSION} \
-        && ./configure --prefix=$BUILD_PREFIX \
-        && make -j4 \
-        && make install)
+    if [ -z "$IS_OSX" ]; then
+        CFLAGS="$CFLAGS -DHAVE_PREAD64 -DHAVE_PWRITE64"
+    fi
+    build_simple sqlite-autoconf $SQLITE_VERSION https://www.sqlite.org/2021
     touch sqlite-stamp
 }
 
