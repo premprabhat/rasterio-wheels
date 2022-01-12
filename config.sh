@@ -183,7 +183,12 @@ function build_curl {
     CFLAGS="$CFLAGS -g -O2"
     CXXFLAGS="$CXXFLAGS -g -O2"
     build_nghttp2
-    local flags="--prefix=$BUILD_PREFIX --with-nghttp2=$BUILD_PREFIX --with-libz --with-ssl"
+    local flags="--prefix=$BUILD_PREFIX --with-nghttp2=$BUILD_PREFIX --with-libz"
+    if [ -n "$IS_OSX" ]; then
+        flags="$flags --with-ssl=${BUILD_PREFIX}/lib"
+    else
+        flags="$flags --with-ssl"
+    fi
     (cd curl-${CURL_VERSION} \
         && LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BUILD_PREFIX/lib:$BUILD_PREFIX/lib64 ./configure $flags \
         && make -j4 \
