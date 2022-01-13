@@ -43,12 +43,16 @@ function fetch_unpack {
 
 function build_openssl {
     if [ -e openssl-stamp ]; then return; fi
-    fetch_unpack ${OPENSSL_DOWNLOAD_URL}/${OPENSSL_ROOT}.tar.gz
-    check_sha256sum $ARCHIVE_SDIR/${OPENSSL_ROOT}.tar.gz ${OPENSSL_HASH}
-    (cd ${OPENSSL_ROOT} \
-        && ./config no-ssl2 no-shared -fPIC --prefix=$BUILD_PREFIX --openssldir=$BUILD_PREFIX \
-        && make -j4 \
-        && make install)
+    if [ -n "$IS_OSX" ]; then
+        brew install openssl@1.1 > /dev/null
+    else
+        fetch_unpack ${OPENSSL_DOWNLOAD_URL}/${OPENSSL_ROOT}.tar.gz
+        check_sha256sum $ARCHIVE_SDIR/${OPENSSL_ROOT}.tar.gz ${OPENSSL_HASH}
+        (cd ${OPENSSL_ROOT} \
+            && ./config no-ssl2 no-shared -fPIC --prefix=$BUILD_PREFIX --openssldir=$BUILD_PREFIX \
+            && make -j4 \
+            && make install)
+    fi
     touch openssl-stamp
 }
 
@@ -331,8 +335,6 @@ function pre_build {
     #    # Update to latest zlib for OSX build
     #    build_new_zlib
     #fi
-
-    sudo chmod +w $BUILD_PREFIX
 
     suppress build_openssl
     suppress build_nghttp2
