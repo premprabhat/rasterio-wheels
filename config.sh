@@ -185,11 +185,15 @@ function build_libwebp {
 
 function build_nghttp2 {
     if [ -e nghttp2-stamp ]; then return; fi
-    fetch_unpack https://github.com/nghttp2/nghttp2/releases/download/v${NGHTTP2_VERSION}/nghttp2-${NGHTTP2_VERSION}.tar.gz
-    (cd nghttp2-${NGHTTP2_VERSION}  \
-        && ./configure --enable-lib-only --prefix=$BUILD_PREFIX \
-        && make -j4 \
-        && make install)
+    if [ -n "$IS_OSX" ]; then
+        brew install nghttp2
+    else
+        fetch_unpack https://github.com/nghttp2/nghttp2/releases/download/v${NGHTTP2_VERSION}/nghttp2-${NGHTTP2_VERSION}.tar.gz
+        (cd nghttp2-${NGHTTP2_VERSION}  \
+            && ./configure --enable-lib-only --prefix=$BUILD_PREFIX \
+            && make -j4 \
+            && make install)
+    fi
     touch nghttp2-stamp
 }
 
@@ -199,16 +203,15 @@ function build_curl {
     CFLAGS="$CFLAGS -g -O2"
     CXXFLAGS="$CXXFLAGS -g -O2"
     build_nghttp2
-    local flags="--prefix=$BUILD_PREFIX --with-nghttp2=$BUILD_PREFIX --with-libz"
     if [ -n "$IS_OSX" ]; then
-        flags="$flags --with-ssl=${BUILD_PREFIX}/lib"
+        brew install curl --with-nghttp2 --with-openssl
     else
-        flags="$flags --with-ssl"
+    	local flags="--prefix=$BUILD_PREFIX --with-nghttp2=$BUILD_PREFIX --with-libz --with-ssl"
+        (cd curl-${CURL_VERSION} \
+            && LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BUILD_PREFIX/lib:$BUILD_PREFIX/lib64 ./configure $flags \
+            && make -j4 \
+            && make install)
     fi
-    (cd curl-${CURL_VERSION} \
-        && LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BUILD_PREFIX/lib:$BUILD_PREFIX/lib64 ./configure $flags \
-        && make -j4 \
-        && make install)
     touch curl-stamp
 }
 
@@ -337,7 +340,7 @@ function pre_build {
     #fi
 
     build_openssl
-    suppress build_nghttp2
+    build_nghttp2
 
     if [ -n "$IS_OSX" ]; then
         rm /usr/local/lib/libpng*
@@ -348,7 +351,7 @@ function pre_build {
     # Remove previously installed curl.
     rm -rf /usr/local/lib/libcurl*
 
-    suppress build_curl
+    build_curl
 
     suppress build_libpng
     suppress build_jpeg
