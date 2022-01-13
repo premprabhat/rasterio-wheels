@@ -41,6 +41,18 @@ function fetch_unpack {
 }
 
 
+function build_openssl {
+    if [ -e openssl-stamp ]; then return; fi
+    fetch_unpack ${OPENSSL_DOWNLOAD_URL}/${OPENSSL_ROOT}.tar.gz
+    check_sha256sum $ARCHIVE_SDIR/${OPENSSL_ROOT}.tar.gz ${OPENSSL_HASH}
+    (cd ${OPENSSL_ROOT} \
+        && ./config no-ssl2 no-shared -fPIC --prefix=$BUILD_PREFIX --openssldir=$BUILD_PREFIX \
+        && make -j4 \
+        && make install)
+    touch openssl-stamp
+}
+
+
 function build_geos {
     CFLAGS="$CFLAGS -g -O2"
     CXXFLAGS="$CXXFLAGS -g -O2"
