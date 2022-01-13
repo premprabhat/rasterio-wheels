@@ -269,7 +269,7 @@ function build_gdal {
             --disable-static \
 	    --disable-driver-elastic \
             --prefix=$BUILD_PREFIX \
-            --with-curl=curl-config \
+            --with-curl=${BUILD_PREFIX}/bin/curl-config \
             --with-expat=${EXPAT_PREFIX} \
             ${GEOS_CONFIG} \
             --with-geotiff=internal \
@@ -366,7 +366,7 @@ function pre_build {
     suppress build_netcdf
     suppress build_zstd
 
-    suppress build_gdal
+    build_gdal
 }
 
 
