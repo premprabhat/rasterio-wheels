@@ -332,6 +332,8 @@ function pre_build {
     #    build_new_zlib
     #fi
 
+    sudo chmod +w $BUILD_PREFIX
+
     suppress build_openssl
     suppress build_nghttp2
 
