@@ -44,7 +44,7 @@ function fetch_unpack {
 function build_openssl {
     if [ -e openssl-stamp ]; then return; fi
     if [ -n "$IS_OSX" ]; then
-        brew install openssl@1.1 > /dev/null
+        brew install openssl@1.1
     else
         fetch_unpack ${OPENSSL_DOWNLOAD_URL}/${OPENSSL_ROOT}.tar.gz
         check_sha256sum $ARCHIVE_SDIR/${OPENSSL_ROOT}.tar.gz ${OPENSSL_HASH}
@@ -336,7 +336,7 @@ function pre_build {
     #    build_new_zlib
     #fi
 
-    suppress build_openssl
+    build_openssl
     suppress build_nghttp2
 
     if [ -n "$IS_OSX" ]; then
