@@ -353,7 +353,8 @@ function pre_build {
 
     build_curl
 
-    find / -name curl-config
+    find /opt -name curl-config
+    find /usr -name curl-config
 
     suppress build_libpng
     suppress build_jpeg
