@@ -253,9 +253,11 @@ function build_gdal {
     if [ -n "$IS_OSX" ]; then
         EXPAT_PREFIX=/usr
         GEOS_CONFIG="--without-geos"
+        CURL_CONFIG="/usr/local/opt/curl/bin/curl-config"
     else
         EXPAT_PREFIX=$BUILD_PREFIX
         GEOS_CONFIG="--with-geos=${BUILD_PREFIX}/bin/geos-config"
+        CURL_CONFIG="curl-config"
     fi
 
     fetch_unpack http://download.osgeo.org/gdal/${GDAL_VERSION}/gdal-${GDAL_VERSION}.tar.gz
@@ -269,7 +271,7 @@ function build_gdal {
             --disable-static \
 	    --disable-driver-elastic \
             --prefix=$BUILD_PREFIX \
-            --with-curl=${BUILD_PREFIX}/bin/curl-config \
+            --with-curl=$CURL_CONFIG \
             --with-expat=${EXPAT_PREFIX} \
             ${GEOS_CONFIG} \
             --with-geotiff=internal \
@@ -339,8 +341,8 @@ function pre_build {
     #    build_new_zlib
     #fi
 
-    build_openssl
-    build_nghttp2
+    suppress build_openssl
+    suprress build_nghttp2
 
     if [ -n "$IS_OSX" ]; then
         rm /usr/local/lib/libpng*
@@ -351,10 +353,7 @@ function pre_build {
     # Remove previously installed curl.
     rm -rf /usr/local/lib/libcurl*
 
-    build_curl
-
-    find /opt -name curl-config
-    find /usr -name curl-config
+    suppress build_curl
 
     suppress build_libpng
     suppress build_jpeg
