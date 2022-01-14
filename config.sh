@@ -342,7 +342,7 @@ function pre_build {
     #fi
 
     suppress build_openssl
-    suprress build_nghttp2
+    suppress build_nghttp2
 
     if [ -n "$IS_OSX" ]; then
         rm /usr/local/lib/libpng*
