@@ -17,11 +17,13 @@ jobs:
       matrix:
         os: [ "ubuntu-20.04", "macos-latest" ]
         python: [ "3.7", "3.8", "3.9", "3.10" ]
-        platform: [ "x86_64" ]
+        platform: [ "x86_64", "aarch64"]
         macos-target: [ "10.10" ]
         exclude:
           - os: "macos-latest"
             platform: "i686"
+          - os: "macos-latest"
+            platform: "aarch64"
         include:
           - os: "macos-latest"
             os-name: "osx"
@@ -43,6 +45,9 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: 3.9
+      - uses: docker/setup-qemu-action@v1
+        if: ${{ matrix.platform == 'aarch64' }}
+        name: Set up QEMU
       - name: Build Wheel
         run: .github/workflows/build.sh
       - uses: actions/upload-artifact@v2
