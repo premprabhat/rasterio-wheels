@@ -14,6 +14,9 @@ if [[ "$MB_PYTHON_VERSION" == pypy3* ]]; then
     DOCKER_TEST_IMAGE="multibuild/focal_$PLAT"
   fi
 fi
+if [[ "$PLAT" == "i686" ]]; then
+    DOCKER_TEST_IMAGE="multibuild/xenial_arm64v8"
+  fi
 
 echo "::group::Install a virtualenv"
   source multibuild/common_utils.sh
